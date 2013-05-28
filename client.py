@@ -13,7 +13,7 @@ root = Tk()
 root.title("SoftDev Team Chat")
 
 w = root.winfo_screenwidth()
-h = root.winfo_screenheight()
+h = root.winfo_screenheight(
 x = 225
 y = 150
 
