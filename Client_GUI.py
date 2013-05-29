@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 '''
 Created on 25 05 2013
 
@@ -5,42 +6,49 @@ Created on 25 05 2013
 '''
 from Tkinter import *
 
-def GetLogin(ev):
-    print text1.get()
-    print text2.get()
+class FormAuthorization:
+    def __init__(self):
+        self.w = root.winfo_screenwidth()
+        self.h = root.winfo_screenheight()
+        self.x = 225
+        self.y = 130
+        
+        #place window into center of the screen
+        root.geometry("%dx%d+%d+%d" % (self.x, self.y, self.w/2-self.x/2, self.h/2-self.y/2))
+        
+        self.login = StringVar()
+        self.password = StringVar()
+        
+        Label(root, text="Login:").place(x=25, y=25)
+        Label(root, text="Password:").place(x=25, y=50)
+        
+        self.text1 = Entry(root, textvariable=self.login)
+        self.text1.place(x=100, y=25, width = 100)
+        
+        self.text2 = Entry(root, textvariable=self.password)
+        self.text2.place(x=100, y=50, width = 100)
+        
+        def OnClick(ev):
+            '''
+            Отправляем логин и пароль на сервер...
+            '''
+            #таким образом получаем значения текстовых полей
+            print self.text1.get()
+            print self.text2.get()
+        
+        btn1 = Button(root, text='Authorization')
+        btn1.place(x=25, y=85, width = 175)
+
+        btn1.bind('<Button-1>', OnClick)
+
+        
 
 root = Tk()
-root.title("SoftDev Team Chat")
+root.title("SoftDev Chat")
 
-w = root.winfo_screenwidth()
-h = root.winfo_screenheight()
-x = 225
-y = 150
-
-#place window into center of the screen
-root.geometry("%dx%d+%d+%d" % (x, y, w/2-x/2, h/2-y/2))
-
-
-Label(root, text="Hi bratyuni!").place(x=25, y=15)
-Label(root, text="Login:").place(x=25, y=50)
-Label(root, text="Password:").place(x=25, y=75)
-
-login = StringVar()
-password = StringVar()
-
-text1 = Entry(root, textvariable=login)
-text1.place(x=100, y=50, width = 100)
-
-text2 = Entry(root, textvariable=password)
-text2.place(x=100, y=75, width = 100)
-
-btn1 = Button(root, text='Show login')#.place(x=25, y=100)
-btn1.place(x=25, y=105)
-
-btn1.bind('<Button-1>', GetLogin)
-
+Form1 = FormAuthorization()
 
 root.mainloop()
 
-#*********************************************************
+
 
