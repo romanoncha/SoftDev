@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+#с импортами думаю ничего сложного
 import threading
 from socket import socket, gethostbyname, AF_INET, SOCK_STREAM
 import errno
 from socket import error
 import sys
 
-# GLOBAL
-busyportlist = []
-freeportlist = []
+# GLOBAL, тут глобальные переменные
 max_client = 20
-
-
 ConnClient = []
 ClientsLogins = []
 
