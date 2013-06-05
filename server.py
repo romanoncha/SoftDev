@@ -87,6 +87,7 @@ class ClientThreading(threading.Thread):
                 self.clientSock.send("Sorry, server is overload. Try later\n")
                 continue
 
-            self.clientSock.send("Welcome to our chat "+self.login+"\n")
+            #self.clientSock.send("Welcome to our chat "+self.login+"\n")
+            print "Welcome to our chat "+self.login+"\n"
             ClientsLogins.append(self.login)
             break
