@@ -13,3 +13,5 @@ class Client(object):
         while True:
             self.data = self.sock.recv(1024)
             print self.data
+client=Client()
+client.receive()
