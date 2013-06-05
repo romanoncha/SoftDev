@@ -8,14 +8,27 @@ class FormAuthorization:
         root.config(menu=menu)
         menu.add_command(label="Connect", command=self.connect )
         menu.add_command(label="Login", command=self.login)
-       
+
         self.w = root.winfo_screenwidth()
         self.h = root.winfo_screenheight()
-        self.x = 800
-        self.y = 640
+        self.x = 650
+        self.y = 400
         root.geometry("%dx%d+%d+%d" % (self.x, self.y, self.w/2-self.x/2, self.h/2-self.y/2))
-        text1=Text(root,height=21,width=60,font='Arial 12',wrap=WORD)
+        text1=Text(root,height=17,width=60,font='Arial 12',wrap=WORD)
+        text1.config(state='disabled')
         text1.pack(side='left')
+        listbox1=Listbox(root,height=20,width=20,selectmode=EXTENDED)
+        listbox1.pack(side='right')
+        self.message=StringVar(root)
+        message=Entry(root,textvariable=self.message)
+        message.place(x=1, y=370, width = 480)
+        def onClick(ev):
+            self.client.send(message.get())
+            text1.insert(END, message.get()+'\n')
+            message.delete('0', END)
+        sendb = Button(root, text='Send')
+        sendb.place(x=482, y=366, width = 64)
+        sendb.bind('<Button-1>', onClick) 
     def connect(self):
         son1=Tk()
         self.w = son1.winfo_screenwidth()
@@ -55,7 +68,7 @@ class FormAuthorization:
         self.text1 = Entry(son2, textvariable=self.login)
         self.text1.place(x=100, y=25, width = 100)
         def onClick(ev):
-            self.client.login(self.login.get())
+            self.client.send(self.login.get())
             son2.withdraw()
         btn1 = Button(son2, text='Login')
         btn1.place(x=25, y=85, width = 175)
