@@ -18,12 +18,12 @@ class Server(object):
     def __init__(self,port):
         '''Base constructor'''
         self.port = port
-        self.sock = socket.socket(AF_INET, SOCK_STREAM)
+        self.sock = socket(AF_INET, SOCK_STREAM)
         self.count = 0
 
     def Start(self):
         '''Start Server'''
-        self.FindFreePort()
+        self.port=self.FindFreePort()
         try:
             self.sock.bind(("",self.port))
         except IOError,e:
@@ -35,8 +35,9 @@ class Server(object):
         while True:
             self.conn, self.adrr = self.sock.accept()
             ConnClient.append(ClientThreading(self.conn,self.adrr))
-            ConnClient[self.count].start()
+            ConnClient[self.count].run()
             self.count += 1
+            print "dsffsd"
 
 
     def Close(self):
@@ -52,11 +53,7 @@ class Server(object):
             if(result != 0):
                 print "Free port ",i
                 self.port = i
-                break
-
-import socket
-import threading
-from Server import *
+                return i
 
 #Client_Threading CLASS
 class ClientThreading(threading.Thread):
@@ -79,6 +76,7 @@ class ClientThreading(threading.Thread):
     def Close(self):
         self.clientSock.close()
     def Autorization(self):
+        print len(ConnClient)
         self.clientSock.send("Hello user, first you must login\n")
         while True:
             self.login = self.clientSock.recv(1024)
