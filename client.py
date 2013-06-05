@@ -10,10 +10,6 @@ class Client(object):
     def login(self,login):
         self.sock.send(login)
     def receive(self):
-        msg = ''
         while True:
-            chunk = self.sock.recv(1024)
-            if chunk == '':
-                raise RuntimeError("socket connection broken")
-            msg = msg + chunk
-        print msg
+            self.data = self.sock.recv(1024)
+            print self.data

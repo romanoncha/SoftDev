@@ -35,9 +35,8 @@ class Server(object):
         while True:
             self.conn, self.adrr = self.sock.accept()
             ConnClient.append(ClientThreading(self.conn,self.adrr))
-            ConnClient[self.count].run()
+            ConnClient[self.count].start()
             self.count += 1
-            print "dsffsd"
 
 
     def Close(self):
