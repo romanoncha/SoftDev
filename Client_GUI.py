@@ -2,7 +2,7 @@
 from Tkinter import *
 from client import *
 class FormAuthorization:
-    def __init__(self):
+    def __init__(self,root):
         self.client=Client()
         menu = Menu(root)
         root.config(menu=menu)
@@ -22,13 +22,13 @@ class FormAuthorization:
         self.message=StringVar(root)
         message=Entry(root,textvariable=self.message)
         message.place(x=1, y=370, width = 480)
-        def onClick(ev):
-            self.client.send(message.get())
-            text1.insert(END, message.get()+'\n')
-            message.delete('0', END)
+        
+
         sendb = Button(root, text='Send')
         sendb.place(x=482, y=366, width = 64)
-        sendb.bind('<Button-1>', onClick) 
+        sendb.bind('<Button-1>', self.onClickSend) 
+        
+        
     def connect(self):
         son1=Tk()
         self.w = son1.winfo_screenwidth()
@@ -47,13 +47,10 @@ class FormAuthorization:
         
         self.text2 = Entry(son1, textvariable=self.port)
         self.text2.place(x=100, y=50, width = 100)
-        def onClick(ev):
-            self.client.connect(self.host.get(),self.port.get())
-            self.login()
-            son1.withdraw()
+        
         btn1 = Button(son1, text='Connect')
         btn1.place(x=25, y=85, width = 175)
-        btn1.bind('<Button-1>', onClick) 
+        btn1.bind('<Button-1>', self.onClickConnect) 
         son1.title("SoftDev Chat")
          
     def login(self):
@@ -67,21 +64,29 @@ class FormAuthorization:
         Label(son2, text="login:").place(x=25, y=25)
         self.text1 = Entry(son2, textvariable=self.login)
         self.text1.place(x=100, y=25, width = 100)
-        def onClick(ev):
-            self.client.send(self.login.get())
-            son2.withdraw()
+            
         btn1 = Button(son2, text='Login')
         btn1.place(x=25, y=85, width = 175)
 
-        btn1.bind('<Button-1>', onClick)
-        son2.title("SoftDev Chat")
-
-
-root = Tk()
-root.title("SoftDev Chat")         
-Form1 = FormAuthorization()
-
-root.mainloop()
+        btn1.bind('<Button-1>', self.onClickLogin)
+        son2.title("SoftDev Chat")  
+    ##################################################################
+    def onStart(self):
+        print "Loading data..."
+        
+    def onClickSend(self,ev):
+        self.client.send(self.message.get())
+        ev.text1.insert(END, self.message.get()+'\n')
+        self.message.delete('0', END)
+        
+    def onClickConnect(self,ev):
+        self.client.connect(self.host.get(),self.port.get())
+        self.login()
+        self.son1.withdraw()
+        
+    def onClickLogin(self,ev):
+        self.client.send(self.login.get())
+        self.onClickLogin.son2.withdraw() 
 
 
 
