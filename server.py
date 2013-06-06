@@ -23,7 +23,7 @@ class Server(object):
 
     def Start(self):
         '''Start Server'''
-        self.port=self.FindFreePort()
+        self.port=1024#self.FindFreePort()
         try:
             self.sock.bind(("",self.port))
         except IOError,e:
@@ -76,17 +76,22 @@ class ClientThreading(threading.Thread):
         self.clientSock.close()
     def Autorization(self):
         print len(ConnClient)
-        self.clientSock.send("Hello user, first you must login\n")
+        print "Hello user, first you must login\n"
+        #self.clientSock.send("Hello user, first you must login\n")
         while True:
-            self.login = self.clientSock.recv(1024)
+            self.login = self.clientSock.recv(16)
             if self.login in ClientsLogins:
-                self.clientSock.send("Sorry, this login is already used, try again\n")
+                #self.clientSock.send("Sorry, this login is already used, try again\n")
+                print("Sorry, this login is already used, try again\n")
                 continue
             elif len(ClientsLogins) >= max_client:
-                self.clientSock.send("Sorry, server is overload. Try later\n")
+                print "Sorry, server is overload. Try later\n"
+                #self.clientSock.send("Sorry, server is overload. Try later\n")
                 continue
 
-            #self.clientSock.send("Welcome to our chat "+self.login+"\n")
+            
             print "Welcome to our chat "+self.login+"\n"
+            self.clientSock.send(self.login)
             ClientsLogins.append(self.login)
+            self.clientSock.send("Welcome to our chat "+self.login+"\n")
             break
