@@ -5,7 +5,7 @@ from threading import Thread
 import tkMessageBox
 import Command
 import sys
-
+from re import compile, findall
 
 class FormAuthorization:
     def __init__(self):
@@ -16,31 +16,33 @@ class FormAuthorization:
 
         self.w = root.winfo_screenwidth()
         self.h = root.winfo_screenheight()
-        self.x = 650
-        self.y = 400
+        self.x = 615
+        self.y = 385
         root.geometry("%dx%d+%d+%d" % (self.x, self.y, self.w/2-self.x/2, self.h/2-self.y/2))
 
-        text1=Text(root,height=17,width=60,font='Arial 10',wrap=WORD)
-        text1.config(state='normal')
-        text1.pack(side='left')
+        self.richTextBox1 = Text(root, height=20, width=60, font='Arial 10',wrap=WORD)
+        self.richTextBox1.config(state='normal')
+        self.richTextBox1.place(x=15, y=15, width=450)
 
-        listbox1=Listbox(root,height=20,width=20,selectmode=EXTENDED)
-        listbox1.pack(side='right')
+        self.listbox1 = Listbox(root, height=20, width=20, selectmode=EXTENDED)
+        self.listbox1.place(x=475, y=15)
 
         self.message=StringVar(root)
-        message=Entry(root,textvariable=self.message)
-        message.place(x=1, y=370, width = 480)
+        textOfMessage=Entry(root,textvariable=self.message)
+        textOfMessage.place(x=15, y=350, width = 450)
 
         def onClick(ev):
-            ##################
-            self.client.Send(message.get())
-            self.text1=self.client.messageText
-            ###################
-            text1.insert(END, message.get()+'\n')
-            message.delete('0', END)
+            #send message
+            if '' == self.message.get():
+                tkMessageBox.showwarning("Empty string!", "Enter the text of message, please!")
+                return
+            self.client.Send(self.message.get())
+            self.richTextBox1.insert(END, self.message.get()+'\n')
+            #self.richTextBox1.insert(END, self.client.GetReceivedData()+'\n')
+            textOfMessage.delete('0', END)
 
         sendb = Button(root, text='Send')
-        sendb.place(x=482, y=366, width = 64)
+        sendb.place(x=475, y=347, width = 125, height = 25)
         sendb.bind('<Button-1>', onClick)
 
         ###########################
@@ -68,8 +70,7 @@ class FormAuthorization:
         self.text2.place(x=75, y=50, width = 75)
 
         def onClick(ev):
-            #self.client.connect(self.host.get(),self.port.get())
-            ##############
+            #make connection
             try:
                 self.client.Connect(self.host.get(), self.port.get())
                 #Thread(target=self.client.StartReceive).start()
@@ -78,7 +79,6 @@ class FormAuthorization:
                                        "Failed to establish connection to the server ("+self.host.get()+":"+str(self.port.get())+")!\nTry again, please!")
                 son1.withdraw()
                 return
-            ################
             self.loginDlg()
             son1.withdraw()
 
@@ -87,18 +87,36 @@ class FormAuthorization:
         btn1.bind('<Button-1>', onClick)
         son1.title("SoftDev Connect")
 
+    def getListOfClients(self):
+        self.command = self.client.GetServerCommand()
+
+        reg = compile("[\w@]+")
+        logs = reg.findall(self.command)
+
+        for log in logs:
+            if (log == Command.transferListStart):
+                continue
+            elif (log == Command.transferListFinish):
+                break
+            else:
+                if (log == self.login.get()):
+                    self.listbox1.insert(END, log+" (You)")
+                    continue
+            self.listbox1.insert(END, log)
+
+
     def loginDlg(self):
         son2=Tk()
         self.w = son2.winfo_screenwidth()
         self.h = son2.winfo_screenheight()
-        self.x = 225
-        self.y = 130
+        self.x = 175
+        self.y = 105
         son2.geometry("%dx%d+%d+%d" % (self.x, self.y, self.w/2-self.x/2, self.h/2-self.y/2))
 
         self.login = StringVar(son2)
         Label(son2, text="Login:").place(x=25, y=25)
         self.text1 = Entry(son2, textvariable=self.login)
-        self.text1.place(x=100, y=25, width = 100)
+        self.text1.place(x=75, y=25, width = 75)
 
         def onClick(ev):
             self.client.ClientInf.Set(self.login.get(), "")
@@ -107,16 +125,19 @@ class FormAuthorization:
 
             if self.command == Command.loginExist:
                 tkMessageBox.showerror("Wrong login","This login is already exist. Try again")
+                son2.withdraw()
                 self.loginDlg()
             if self.command == Command.serverOverload:
                 tkMessageBox.showerror("Server is overload","Server is overload. Try later")
                 sys.exit(0)
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
+                self.getListOfClients()
                 son2.withdraw()
 
+
         btn1 = Button(son2, text='Login')
-        btn1.place(x=25, y=85, width = 175)
+        btn1.place(x=25, y=60, width = 125)
 
         btn1.bind('<Button-1>', onClick)
         son2.title("SoftDev Login")

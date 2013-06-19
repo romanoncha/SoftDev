@@ -18,8 +18,8 @@ class Types:
     connecting=123456;
     canSendMessage=1234567;
     disconnected=12345678;
-    
-class Client ():    
+
+class Client ():
     def __init__(self):
         'Client init'
         self.Socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -30,25 +30,25 @@ class Client ():
         self.state=Types()
         self.ClientInf=ClientInfo()
 
-    
+
     def Connect(self,ip,port):
         'connect to ip and port, where ip string and port integer'
         self.state=Types.connecting
         self.Socket.connect((ip,port))
         print "Connect"
-        
+
     def ConnectWithName(self,name,ip,port):
         'connect to ip and port, where ip string and port integer'
         self.state=Types.connecting
         self.Socket.connect((ip,port))
         print "Connect"
-        
+
     def Disconnect(self):
         'connect to ip and port'
         self.state=Types.disconnected
         self.Socket.close()
         print "Disconnect"
-        
+
     def Send(self,message):
         'send message to server'
         #if self.state==Types.canSendMessage:
@@ -61,11 +61,11 @@ class Client ():
             self.Socket.send(self.ClientInf.userName)
             if self.state==Types.canSendMessage:
                 break
-            
+
     def SendLoggin(self):
         'send message to server'
         self.Socket.send(self.ClientInf.userName)
-            
+
 
     def Autorization(self):
 
@@ -75,7 +75,7 @@ class Client ():
         print self.servCommand
         return self.servCommand
 
-    def StartReceive(self): 
+    def StartReceive(self):
         print "StartReceive "
         while True:
             if self.state==Types.connecting:
@@ -95,6 +95,14 @@ class Client ():
                     print "Server Message: "+self.messageText
             if self.state==Types.disconnected:
                 break
-    
+
+    def GetServerCommand(self):
+        self.servCommand = self.Socket.recv(1024)
+        self.servCommand.decode()
+        print self.servCommand+'\n'
+        return self.servCommand
+
     def GetReceivedData(self):
-        print self.data
+        self.data = self.Socket.recv(1024)
+        self.data.decode()
+        return self.data

@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 import threading
 import server
-import Command 
+import Command
 
 class ClientThreading(threading.Thread):
     def __init__(self, clientSock, addr):
@@ -12,7 +12,7 @@ class ClientThreading(threading.Thread):
         threading.Thread.__init__(self)
 
     def run (self):
-        
+
         self.Autorization()
         self.Chat()
 
@@ -36,6 +36,13 @@ class ClientThreading(threading.Thread):
                 continue
             self.clientSock.send(Command.welcome)
             server.ClientsLogins.append(self.login)
+
+            self.clientSock.send(Command.transferListStart+'\n')
+            for login in server.ClientsLogins:
+                self.clientSock.send(login+'\n')
+
+            self.clientSock.send(Command.transferListFinish+'\n')
+
             break
 
     def Chat(self):

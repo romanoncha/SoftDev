@@ -4,10 +4,9 @@
 #с импортами думаю ничего сложного
 import threading
 from socket import socket, gethostbyname, AF_INET, SOCK_STREAM, error
-import errno 
+import errno
 import sys
 from ClientThreading import *
-from Message import *
 from ServerConsoleThread import *
 from Command import *
 
