@@ -3,6 +3,8 @@ from Tkinter import *
 from client import *
 from threading import Thread
 import tkMessageBox
+import Command
+import sys
 
 
 class FormAuthorization:
@@ -70,14 +72,14 @@ class FormAuthorization:
             ##############
             try:
                 self.client.Connect(self.host.get(), self.port.get())
-                Thread(target=self.client.StartReceive).start()
+                #Thread(target=self.client.StartReceive).start()
             except IOError,e:
                 tkMessageBox.showerror("Connection Error!",
                                        "Failed to establish connection to the server ("+self.host.get()+":"+str(self.port.get())+")!\nTry again, please!")
                 son1.withdraw()
                 return
             ################
-            self.login()
+            self.loginDlg()
             son1.withdraw()
 
         btn1 = Button(son1, text='Connect')
@@ -85,7 +87,7 @@ class FormAuthorization:
         btn1.bind('<Button-1>', onClick)
         son1.title("SoftDev Connect")
 
-    def login(self):
+    def loginDlg(self):
         son2=Tk()
         self.w = son2.winfo_screenwidth()
         self.h = son2.winfo_screenheight()
@@ -99,10 +101,19 @@ class FormAuthorization:
         self.text1.place(x=100, y=25, width = 100)
 
         def onClick(ev):
-            self.client.Send(self.login.get())
-            self.client.ClientInf.Set("FIRST USER", "")
-            self.client.SendLoggin()
-            son2.withdraw()
+            self.client.ClientInf.Set(self.login.get(), "")
+
+            self.command = self.client.Autorization()
+
+            if self.command == Command.loginExist:
+                tkMessageBox.showerror("Wrong login","This login is already exist. Try again")
+                self.loginDlg()
+            if self.command == Command.serverOverload:
+                tkMessageBox.showerror("Server is overload","Server is overload. Try later")
+                sys.exit(0)
+            if self.command == Command.welcome:
+                tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
+                son2.withdraw()
 
         btn1 = Button(son2, text='Login')
         btn1.place(x=25, y=85, width = 175)

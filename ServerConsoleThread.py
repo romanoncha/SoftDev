@@ -4,6 +4,7 @@
 import threading
 import server
 import sys
+from Command import *
 
 class ServerConsoleThread(threading.Thread):
 	def __init__(self, sock):
@@ -41,8 +42,12 @@ class ServerConsoleThread(threading.Thread):
 			if self.login != "@back":
 				if self.login in server.ClientsLogins:
 					self.index = server.ClientsLogins.index(self.login)
+					self.messageOut = "@@Kill@@"
+					server.ConnClient[self.index].GetSocket().send(self.messageOut)
 					server.ConnClient[self.index].Close()
 					del server.ClientsLogins[self.index]
+				else:
+					print "Can't find this login in list"
 			else:
 				return
 
@@ -54,6 +59,7 @@ class ServerConsoleThread(threading.Thread):
 
 	def CloseServer(self):
 		if self.IsListEmpty(server.ConnClient):
+			print "Exit in Server Console"
 			self.sock.close()
 			sys.exit(0)
 		else:

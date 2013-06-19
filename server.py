@@ -6,8 +6,10 @@ import threading
 from socket import socket, gethostbyname, AF_INET, SOCK_STREAM, error
 import errno 
 import sys
-from ServerConsoleThread import *
 from ClientThreading import *
+from Message import *
+from ServerConsoleThread import *
+from Command import *
 
 # GLOBAL, тут глобальные переменные
 global max_client
@@ -25,11 +27,12 @@ class Server(object):
         self.sock = socket(AF_INET, SOCK_STREAM)
         self.count = 0
 
+
     def Start(self):
         '''Start Server'''
-        self.port=1024#self.FindFreePort()
+        self.port = self.FindFreePort()
         try:
-            self.sock.bind(("",self.port))
+            self.sock.bind(("", self.port))
         except IOError,e:
             print e
             sys.exit("Sorry, error , can't create socket")
@@ -48,10 +51,14 @@ class Server(object):
 
     def Close(self):
         '''Finish work'''
-        for conn in ConnClient:
-            conn.Close()
-        self.sock.close()
-        sys.exit()
+
+        if not ConnClient:
+            sys.exit()
+        else:
+            for conn in ConnClient:
+                conn.Close()
+            self.sock.close()
+            sys.exit()
 
     def FindFreePort(self):
         '''Locks for free port'''
@@ -59,4 +66,4 @@ class Server(object):
             result = self.sock.connect_ex(("", i))
             if(result != 0):
                 print "Free port ",i
-                self.port = i
+                return i
