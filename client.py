@@ -51,14 +51,7 @@ class Client ():
         self.servCommand = self.Socket.recv(1024)
         self.servCommand.decode()
         return self.servCommand
-
-    def StartReceive(self):
-        print "StartReceive "
-        while True:
-            self.data=self.Socket.recv(1024)
-            print 'DATA '+self.data
-                
-
+          
     def GetServerCommand(self):
         self.servCommand = self.Socket.recv(1024)
         self.servCommand.decode()

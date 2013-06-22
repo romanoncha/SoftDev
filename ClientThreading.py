@@ -57,8 +57,8 @@ class ClientThreading(threading.Thread):
         return self.clientSock
 
     def SendUserList(self):
-
-        self.clientSock.send(Command.transferListStart+'\n')
-        for login in server.ClientsLogins:
-                self.clientSock.send(login+'\n')
-        self.clientSock.send(Command.transferListFinish+'\n')
+        for client in server.ConnClient:
+            client.clientSock.send(Command.transferListStart+'\n')
+            for login in server.ClientsLogins:
+                client.clientSock.send(login+'\n')
+            client.clientSock.send(Command.transferListFinish+'\n')

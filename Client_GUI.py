@@ -13,7 +13,7 @@ class FormAuthorization:
         menu = Menu(root)
         root.config(menu=menu)
         menu.add_command(label="Connect", command=self.connect )
-
+        self.iam=NONE
         self.w = root.winfo_screenwidth()
         self.h = root.winfo_screenheight()
         self.x = 615
@@ -49,6 +49,7 @@ class FormAuthorization:
     def StartReceive(self):
         print "StartReceive "
         while True:
+            self.getListOfClients()
             self.data=self.client.Socket.recv(1024)
             print 'DATA '+self.data
             self.richTextBox1.insert(END, self.data.decode()+'\n')
@@ -98,14 +99,14 @@ class FormAuthorization:
 
         reg = compile("[\w@]+")
         logs = reg.findall(self.command)
-
+        self.listbox1.delete(0,END)
         for log in logs:
             if (log == Command.transferListStart):
                 continue
             elif (log == Command.transferListFinish):
                 break
             else:
-                if (log == self.login.get()):
+                if (log == self.iam):
                     self.listbox1.insert(END, log+" (You)")
                     continue
             self.listbox1.insert(END, log)
@@ -138,7 +139,7 @@ class FormAuthorization:
                 sys.exit(0)
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
-                self.getListOfClients()
+                self.iam=self.login
                 Thread(target=self.StartReceive).start()
                 son2.withdraw()
 
