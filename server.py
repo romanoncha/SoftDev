@@ -31,7 +31,7 @@ class Server(object):
         '''Start Server'''
         self.port = self.FindFreePort()
         try:
-            self.sock.bind(("", self.port))
+            self.sock.bind(("", self.port+1))
         except IOError,e:
             print e
             sys.exit("Sorry, error , can't create socket")

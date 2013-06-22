@@ -46,7 +46,13 @@ class FormAuthorization:
         sendb.bind('<Button-1>', onClick)
 
         ###########################
-
+    def StartReceive(self):
+        print "StartReceive "
+        while True:
+            self.data=self.client.Socket.recv(1024)
+            print 'DATA '+self.data
+            self.richTextBox1.insert(END, self.data.decode()+'\n')
+            
     def connect(self):
         son1=Tk()
         self.w = son1.winfo_screenwidth()
@@ -133,7 +139,7 @@ class FormAuthorization:
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
                 self.getListOfClients()
-                Thread(target=self.client.StartReceive).start()
+                Thread(target=self.StartReceive).start()
                 son2.withdraw()
 
 

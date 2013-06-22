@@ -3,6 +3,7 @@
 import threading
 import server
 import Command
+import time
 
 class ClientThreading(threading.Thread):
     def __init__(self, clientSock, addr):
@@ -14,6 +15,7 @@ class ClientThreading(threading.Thread):
     def run (self):
 
         self.Autorization()
+        #time.sleep(5)
         self.SendUserList()
         self.Chat()
 
