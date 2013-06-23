@@ -14,6 +14,7 @@ class ClientThreading(threading.Thread):
     def run (self):
 
         self.Autorization()
+        self.SendUserList()
         self.Chat()
 
 
@@ -36,13 +37,6 @@ class ClientThreading(threading.Thread):
                 continue
             self.clientSock.send(Command.welcome)
             server.ClientsLogins.append(self.login)
-
-            self.clientSock.send(Command.transferListStart+'\n')
-            for login in server.ClientsLogins:
-                self.clientSock.send(login+'\n')
-
-            self.clientSock.send(Command.transferListFinish+'\n')
-
             break
 
     def Chat(self):
@@ -50,6 +44,7 @@ class ClientThreading(threading.Thread):
         while True:
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
+            print self.messageIn
             for client in server.ConnClient:
                 if client == self:
                     continue
@@ -58,3 +53,10 @@ class ClientThreading(threading.Thread):
 
     def GetSocket(self):
         return self.clientSock
+
+    def SendUserList(self):
+
+        self.clientSock.send(Command.transferListStart+'\n')
+        for login in server.ClientsLogins:
+                self.clientSock.send(login+'\n')
+        self.clientSock.send(Command.transferListFinish+'\n')

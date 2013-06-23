@@ -133,6 +133,7 @@ class FormAuthorization:
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
                 self.getListOfClients()
+                Thread(target=self.client.StartReceive).start()
                 son2.withdraw()
 
 
