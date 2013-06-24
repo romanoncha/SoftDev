@@ -3,6 +3,7 @@ encoding/ClientThreading.py=utf-8
 encoding/Client_GUI.py=utf-8
 encoding/Command.py=utf-8
 encoding/Main.py=utf-8
+encoding/ServerConsoleThread.py=utf-8
 encoding/client.py=utf-8
 encoding/server.py=utf-8
 encoding/server_test.py=cp1251

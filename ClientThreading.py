@@ -16,7 +16,10 @@ class ClientThreading(threading.Thread):
 
         self.Autorization()
         #time.sleep(5)
-        self.SendUserList()
+        self.messageIn = self.clientSock.recv(1024)
+        if self.messageIn.decode() == "ready":
+            print self.messageIn
+            self.SendUserList()
         self.Chat()
 
 
@@ -42,23 +45,29 @@ class ClientThreading(threading.Thread):
             break
 
     def Chat(self):
-
         while True:
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
             print self.messageIn
+            now = time.localtime(time.time())
+            year, month, day, hour, minute, second, weekday, yearday, daylight = now
+            mess="[" +"%02d:%02d:%02d" % (hour, minute, second)+"] "+self.messageIn
+             
             for client in server.ConnClient:
                 if client == self:
                     continue
                 else:
-                    client.clientSock.send(self.messageIn)
+                    client.clientSock.send(mess)
 
     def GetSocket(self):
         return self.clientSock
 
     def SendUserList(self):
+        print "SendUserList"
         for client in server.ConnClient:
-            client.clientSock.send(Command.transferListStart+'\n')
+            #client.clientSock.send(Command.transferListStart+'\n',10)
             for login in server.ClientsLogins:
-                client.clientSock.send(login+'\n')
-            client.clientSock.send(Command.transferListFinish+'\n')
+                #size = len(login) + 1
+                #client.clientSock.send(str(size))
+                client.clientSock.send('@'+login+'\n')
+            #client.clientSock.send(Command.transferListFinish+'\n',10)
