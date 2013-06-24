@@ -90,12 +90,6 @@ class FormAuthorization:
         btn1.bind('<Button-1>', onClick)
         son1.title("SoftDev Connect")
 
-<<<<<<< HEAD
-=======
-    #def getListOfClients(self):
-        
-
->>>>>>> a6c4615ce1697c7808ab84d4be6ca01fe0c52a5e
 
     def loginDlg(self):
         son2=Tk()
@@ -136,13 +130,9 @@ class FormAuthorization:
         son2.title("SoftDev Login")
 
     def StartReceive(self):
-<<<<<<< HEAD
 
         print Command.readyToResive
         self.client.Socket.send(Command.readyToResive)
-=======
-        self.client.Socket.send("ready")
->>>>>>> a6c4615ce1697c7808ab84d4be6ca01fe0c52a5e
         while True:
             self.datas = self.client.GetReceivedData()
             print self.datas
