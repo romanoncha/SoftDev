@@ -10,8 +10,8 @@ serverOverload = "@@ServerOverload@@"
 global welcome
 welcome = "@@Welcome@@"
 
-global transferListStart
-transferListStart = "@@TransferListStart@@"
+global readyToResive
+readyToResive = "@@ReadyToResive@@"
 
-global transferListFinish
-transferListFinish = "@@TransferListFinish@@"
+global readyToResiveMessageList
+readyToResiveMessageList = "@@readyToResiveMessageList@@"

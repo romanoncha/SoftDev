@@ -6,6 +6,7 @@ import tkMessageBox
 import Command
 import sys
 from re import compile, findall
+import time
 
 class FormAuthorization:
     def __init__(self):
@@ -13,7 +14,7 @@ class FormAuthorization:
         menu = Menu(root)
         root.config(menu=menu)
         menu.add_command(label="Connect", command=self.connect )
-
+        self.iam=""
         self.w = root.winfo_screenwidth()
         self.h = root.winfo_screenheight()
         self.x = 615
@@ -36,8 +37,10 @@ class FormAuthorization:
             if '' == self.message.get():
                 tkMessageBox.showwarning("Empty string!", "Enter the text of message, please!")
                 return
-            self.client.Send(self.message.get())
-            self.richTextBox1.insert(END, self.message.get()+'\n')
+            mess = self.client.FormMessage(self.message.get())
+             
+            self.client.Send(self.iam + ": " + self.message.get())
+            self.richTextBox1.insert(END, mess +'\n')
             #self.richTextBox1.insert(END, self.client.GetReceivedData()+'\n')
             textOfMessage.delete('0', END)
 
@@ -47,6 +50,7 @@ class FormAuthorization:
 
         ###########################
 
+            
     def connect(self):
         son1=Tk()
         self.w = son1.winfo_screenwidth()
@@ -73,7 +77,6 @@ class FormAuthorization:
             #make connection
             try:
                 self.client.Connect(self.host.get(), self.port.get())
-                #Thread(target=self.client.StartReceive).start()
             except IOError,e:
                 tkMessageBox.showerror("Connection Error!",
                                        "Failed to establish connection to the server ("+self.host.get()+":"+str(self.port.get())+")!\nTry again, please!")
@@ -86,23 +89,6 @@ class FormAuthorization:
         btn1.place(x=25, y=85, width = 125)
         btn1.bind('<Button-1>', onClick)
         son1.title("SoftDev Connect")
-
-    def getListOfClients(self):
-        self.command = self.client.GetServerCommand()
-
-        reg = compile("[\w@]+")
-        logs = reg.findall(self.command)
-
-        for log in logs:
-            if (log == Command.transferListStart):
-                continue
-            elif (log == Command.transferListFinish):
-                break
-            else:
-                if (log == self.login.get()):
-                    self.listbox1.insert(END, log+" (You)")
-                    continue
-            self.listbox1.insert(END, log)
 
 
     def loginDlg(self):
@@ -132,8 +118,8 @@ class FormAuthorization:
                 sys.exit(0)
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
-                self.getListOfClients()
-                Thread(target=self.client.StartReceive).start()
+                self.iam=self.login.get()
+                Thread(target=self.StartReceive).start()
                 son2.withdraw()
 
 
@@ -143,6 +129,33 @@ class FormAuthorization:
         btn1.bind('<Button-1>', onClick)
         son2.title("SoftDev Login")
 
+    def StartReceive(self):
+
+        print Command.readyToResive
+        self.client.Socket.send(Command.readyToResive)
+        while True:
+            self.datas = self.client.GetReceivedData()
+            print self.datas
+            
+            t = type(self.datas)
+            if t == str:
+                self.richTextBox1.insert(END, self.datas+'\n')
+            elif t == list:    
+                for data in self.datas:
+                    if data[0]=='@':
+                        self.listbox1.insert(END,data)
+            
+            l = self.listbox1.get(0, END)
+            s = set(l)
+            l = list(s)
+            self.listbox1.delete(0, END)
+            for a in l:
+                if a == "@"+self.iam:
+                    self.listbox1.insert(END,a+"(You)")
+                else:
+                    self.listbox1.insert(END,a)
+            
+                    
 
 root = Tk()
 root.title("SoftDev Chat")

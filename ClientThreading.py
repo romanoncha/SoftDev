@@ -3,6 +3,7 @@
 import threading
 import server
 import Command
+import time
 
 class ClientThreading(threading.Thread):
     def __init__(self, clientSock, addr):
@@ -14,13 +15,23 @@ class ClientThreading(threading.Thread):
     def run (self):
 
         self.Autorization()
-        self.SendUserList()
+        self.messageIn = self.clientSock.recv(1024)
+        if self.messageIn.decode() == Command.readyToResive:
+            self.SendUserList()
+        self.SendMessageList()
         self.Chat()
 
 
     def Close(self):
-
         self.clientSock.close()
+
+    def SendMessageForAll(self, message):
+
+        for client in server.ConnClient:
+            if client == self:
+                continue
+            else:
+                client.clientSock.send(message)
 
     def Autorization(self):
 
@@ -37,6 +48,9 @@ class ClientThreading(threading.Thread):
                 continue
             self.clientSock.send(Command.welcome)
             server.ClientsLogins.append(self.login)
+            message = "NEW USER IN CHAT: " + self.login
+            self.SendMessageForAll(message)
+            self.AddToMessageList(message)
             break
 
     def Chat(self):
@@ -44,19 +58,43 @@ class ClientThreading(threading.Thread):
         while True:
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
-            print self.messageIn
-            for client in server.ConnClient:
-                if client == self:
-                    continue
-                else:
-                    client.clientSock.send(self.messageIn)
+            self.messageIn = self.FormMessage(self.messageIn)
+            print "In Chat"
+            self.AddToMessageList(self.messageIn)
+            self.SendMessageForAll(self.messageIn)
 
     def GetSocket(self):
+
         return self.clientSock
 
     def SendUserList(self):
 
-        self.clientSock.send(Command.transferListStart+'\n')
-        for login in server.ClientsLogins:
-                self.clientSock.send(login+'\n')
-        self.clientSock.send(Command.transferListFinish+'\n')
+        for client in server.ConnClient:
+            for login in server.ClientsLogins:
+                client.clientSock.send('@'+login+'\n')
+
+    def FormMessage(self, message):
+
+        now = time.localtime(time.time())
+        year, month, day, hour, minute, second, weekday, yearday, daylight = now
+        message = "[" +"%02d:%02d:%02d" % (hour, minute, second)+"] "+ message
+        return message
+
+    def AddToMessageList(self, message):
+
+        length = len(server.MessageList)
+        if length >= server.max_message:
+            server.MessageList.delete(0)
+        server.MessageList.append(message)
+        print "MessageList"
+        print server.MessageList
+
+    def SendMessageList(self):
+
+        time.sleep(0.1)
+        for message in server.MessageList:
+            print "SendMessageList" + message
+            self.clientSock.send(message + "\n")
+
+
+

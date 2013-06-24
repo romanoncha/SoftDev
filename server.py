@@ -17,6 +17,10 @@ global ConnClient
 ConnClient = []
 global ClientsLogins
 ClientsLogins = []
+global MessageList
+MessageList = []
+global max_message
+max_message = 20
 
 class Server(object):
 

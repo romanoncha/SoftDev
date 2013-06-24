@@ -5,6 +5,8 @@ Client classes
 import socket
 from threading import Thread
 from Command import *
+from re import compile, findall
+import time
 
 class ClientInfo:
     def __init__(self):
@@ -34,8 +36,7 @@ class Client ():
         print "Disconnect"
 
     def Send(self,message):
-        'send message to server'
-        #if self.state==Types.canSendMessage:
+        'send message to server'     
         self.Socket.send(message)
         print "Send"
 
@@ -52,20 +53,19 @@ class Client ():
         self.servCommand.decode()
         return self.servCommand
 
-    def StartReceive(self):
-        print "StartReceive "
-        while True:
-            self.data=self.Socket.recv(1024)
-            print 'DATA '+self.data
-                
-
-    def GetServerCommand(self):
-        self.servCommand = self.Socket.recv(1024)
-        self.servCommand.decode()
-        print self.servCommand+'\n'
-        return self.servCommand
-
     def GetReceivedData(self):
         self.data = self.Socket.recv(1024)
-        self.data.decode()
-        return self.data
+        
+        reg = compile("[@][\w]+")
+        logs = reg.findall(self.data)
+        print logs
+        if logs==[]:
+            return self.data
+        else:
+            return logs
+        
+    def FormMessage(self,message):
+        now = time.localtime(time.time())
+        year, month, day, hour, minute, second, weekday, yearday, daylight = now
+        message ="[" +"%02d:%02d:%02d" % (hour, minute, second)+"] " + message
+        return message
