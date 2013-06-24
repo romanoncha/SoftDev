@@ -33,7 +33,7 @@ class Server(object):
 
     def Start(self):
         '''Start Server'''
-        self.port = self.FindFreePort()
+        #self.port = self.FindFreePort()
         try:
             self.sock.bind(("", self.port))
         except IOError,e:

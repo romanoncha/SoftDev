@@ -15,10 +15,18 @@ class ClientThreading(threading.Thread):
     def run (self):
 
         self.Autorization()
+<<<<<<< HEAD
         self.messageIn = self.clientSock.recv(1024)
         if self.messageIn.decode() == Command.readyToResive:
             self.SendUserList()
         self.SendMessageList()
+=======
+        #time.sleep(5)
+        self.messageIn = self.clientSock.recv(1024)
+        if self.messageIn.decode() == "ready":
+            print self.messageIn
+            self.SendUserList()
+>>>>>>> a6c4615ce1697c7808ab84d4be6ca01fe0c52a5e
         self.Chat()
 
 
@@ -54,20 +62,33 @@ class ClientThreading(threading.Thread):
             break
 
     def Chat(self):
-
         while True:
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
+<<<<<<< HEAD
             self.messageIn = self.FormMessage(self.messageIn)
             print "In Chat"
             self.AddToMessageList(self.messageIn)
             self.SendMessageForAll(self.messageIn)
+=======
+            print self.messageIn
+            now = time.localtime(time.time())
+            year, month, day, hour, minute, second, weekday, yearday, daylight = now
+            mess="[" +"%02d:%02d:%02d" % (hour, minute, second)+"] "+self.messageIn
+             
+            for client in server.ConnClient:
+                if client == self:
+                    continue
+                else:
+                    client.clientSock.send(mess)
+>>>>>>> a6c4615ce1697c7808ab84d4be6ca01fe0c52a5e
 
     def GetSocket(self):
 
         return self.clientSock
 
     def SendUserList(self):
+<<<<<<< HEAD
 
         for client in server.ConnClient:
             for login in server.ClientsLogins:
@@ -98,3 +119,13 @@ class ClientThreading(threading.Thread):
 
 
 
+=======
+        print "SendUserList"
+        for client in server.ConnClient:
+            #client.clientSock.send(Command.transferListStart+'\n',10)
+            for login in server.ClientsLogins:
+                #size = len(login) + 1
+                #client.clientSock.send(str(size))
+                client.clientSock.send('@'+login+'\n')
+            #client.clientSock.send(Command.transferListFinish+'\n',10)
+>>>>>>> a6c4615ce1697c7808ab84d4be6ca01fe0c52a5e
