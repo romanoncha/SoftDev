@@ -4,7 +4,7 @@
 import threading
 import server
 import sys
-from Command import *
+import Command
 
 class ServerConsoleThread(threading.Thread):
 	def __init__(self, sock):
@@ -42,7 +42,7 @@ class ServerConsoleThread(threading.Thread):
 			if self.login != "@back":
 				if self.login in server.ClientsLogins:
 					self.index = server.ClientsLogins.index(self.login)
-					self.messageOut = "@@Kill@@"
+					self.messageOut = Command.clientDisconnect
 					server.ConnClient[self.index].GetSocket().send(self.messageOut)
 					server.ConnClient[self.index].Close()
 					del server.ClientsLogins[self.index]

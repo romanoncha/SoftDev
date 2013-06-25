@@ -58,10 +58,19 @@ class ClientThreading(threading.Thread):
         while True:
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
-            self.messageIn = self.FormMessage(self.messageIn)
-            print "In Chat"
-            self.AddToMessageList(self.messageIn)
-            self.SendMessageForAll(self.messageIn)
+            if self.messageIn == Command.clientDisconnect:
+                self.messageIn = self.clientSock.recv(1024)
+                self.messageIn.decode() 
+                if self.messageIn in server.ClientsLogins:
+                    self.index = server.ClientsLogins.index(self.messageIn)
+                    server.ConnClient[self.index].GetSocket().send(Command.clientDestroy)
+                    server.ConnClient[self.index].Close()
+                    del server.ClientsLogins[self.index]
+            else:
+                self.messageIn = self.FormMessage(self.messageIn)
+                print "In Chat"
+                self.AddToMessageList(self.messageIn)
+                self.SendMessageForAll(self.messageIn)
 
     def GetSocket(self):
 
@@ -87,13 +96,11 @@ class ClientThreading(threading.Thread):
             server.MessageList.delete(0)
         server.MessageList.append(message)
         print "MessageList"
-        print server.MessageList
 
     def SendMessageList(self):
 
         time.sleep(0.1)
         for message in server.MessageList:
-            print "SendMessageList" + message
             self.clientSock.send(message + "\n")
 
 

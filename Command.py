@@ -2,16 +2,22 @@
 #-*- coding:utf-8 -*-
 
 global loginExist
-loginExist= "@@LoginExist@@"
+loginExist= "/LoginExist/"
 
 global serverOverload
-serverOverload = "@@ServerOverload@@"
+serverOverload = "/ServerOverload/"
 
 global welcome
-welcome = "@@Welcome@@"
+welcome = "/Welcome/"
 
 global readyToResive
-readyToResive = "@@ReadyToResive@@"
+readyToResive = "/ReadyToResive/"
 
 global readyToResiveMessageList
-readyToResiveMessageList = "@@readyToResiveMessageList@@"
+readyToResiveMessageList = "/readyToResiveMessageList/"
+
+global clientDisconnect
+clientDisconnect = "/clientDisconnect/"
+
+global clientDestroy
+clientDestroy = "/destroy/"

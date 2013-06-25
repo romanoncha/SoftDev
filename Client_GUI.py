@@ -13,6 +13,7 @@ class FormAuthorization:
         self.client=Client()
         menu = Menu(root)
         root.config(menu=menu)
+        root.protocol("WM_DELETE_WINDOW", self.Quit) 
         menu.add_command(label="Connect", command=self.connect )
         self.iam=""
         self.w = root.winfo_screenwidth()
@@ -22,7 +23,7 @@ class FormAuthorization:
         root.geometry("%dx%d+%d+%d" % (self.x, self.y, self.w/2-self.x/2, self.h/2-self.y/2))
 
         self.richTextBox1 = Text(root, height=20, width=60, font='Arial 10',wrap=WORD)
-        self.richTextBox1.config(state='normal')
+        self.richTextBox1.config(state=DISABLED)
         self.richTextBox1.place(x=15, y=15, width=450)
 
         self.listbox1 = Listbox(root, height=20, width=20, selectmode=EXTENDED)
@@ -38,10 +39,11 @@ class FormAuthorization:
                 tkMessageBox.showwarning("Empty string!", "Enter the text of message, please!")
                 return
             mess = self.client.FormMessage(self.message.get())
-             
             self.client.Send(self.iam + ": " + self.message.get())
-            self.richTextBox1.insert(END, mess +'\n')
-            #self.richTextBox1.insert(END, self.client.GetReceivedData()+'\n')
+            self.richTextBox1.config(state=NORMAL)
+            self.richTextBox1.tag_config('this',foreground='red',font=("Arial", 10,'bold'))
+            self.richTextBox1.insert(END, mess +'\n','this')
+            self.richTextBox1.config(state=DISABLED)
             textOfMessage.delete('0', END)
 
         sendb = Button(root, text='Send')
@@ -128,18 +130,36 @@ class FormAuthorization:
 
         btn1.bind('<Button-1>', onClick)
         son2.title("SoftDev Login")
-
+    def Quit(self):
+        print self.client.Socket.getsockname()
+        if self.client.Socket.getsockname()!= ('0.0.0.0', 0):
+            self.client.Socket.send("USER " + self.iam + " DISCONNECT" )
+            self.client.Socket.send(Command.clientDisconnect)
+            while True:
+                self.client.Socket.send(self.iam)
+                self.datas = self.client.GetReceivedData()
+                if self.data.decode() == Command.clientDestroy:
+                    self.client.Socket.close()
+                    root.destroy()
+        else:
+            root.destroy()
+        
     def StartReceive(self):
-
-        print Command.readyToResive
         self.client.Socket.send(Command.readyToResive)
         while True:
             self.datas = self.client.GetReceivedData()
             print self.datas
-            
             t = type(self.datas)
             if t == str:
-                self.richTextBox1.insert(END, self.datas+'\n')
+                if self.datas == Command.clientDisconnect:
+                    self.richTextBox1.config(state=NORMAL)
+                    self.richTextBox1.insert(END,"You was disconnected by server. Please try reconnect"+'\n')
+                    self.richTextBox1.config(state=DISABLED)
+                else:
+                    self.richTextBox1.config(state=NORMAL)
+                    self.richTextBox1.tag_config('that',foreground='green',font=("Arial", 10,'bold'))
+                    self.richTextBox1.insert(END, self.datas+'\n','that')
+                    self.richTextBox1.config(state=DISABLED)
             elif t == list:    
                 for data in self.datas:
                     if data[0]=='@':

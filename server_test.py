@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#-*- coding:cp1251 -*-
 import server
 import unittest
 

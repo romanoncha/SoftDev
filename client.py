@@ -55,10 +55,8 @@ class Client ():
 
     def GetReceivedData(self):
         self.data = self.Socket.recv(1024)
-        
         reg = compile("[@][\w]+")
         logs = reg.findall(self.data)
-        print logs
         if logs==[]:
             return self.data
         else:
