@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 from Tkinter import *
 from client import *
-from threading import Thread
+import threading
 import tkMessageBox
 import Command
 import sys
@@ -12,6 +12,8 @@ class FormAuthorization:
     def __init__(self):
         self.client=Client()
         menu = Menu(root)
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread(target=self.StartReceive)
         root.config(menu=menu)
         root.protocol("WM_DELETE_WINDOW", self.Quit) 
         menu.add_command(label="Connect", command=self.connect )
@@ -121,7 +123,7 @@ class FormAuthorization:
             if self.command == Command.welcome:
                 tkMessageBox.showinfo("Welcome","Welcome to our chat " + self.client.ClientInf.userName)
                 self.iam=self.login.get()
-                Thread(target=self.StartReceive).start()
+                self.thread.start()
                 son2.withdraw()
 
 
@@ -130,51 +132,56 @@ class FormAuthorization:
 
         btn1.bind('<Button-1>', onClick)
         son2.title("SoftDev Login")
+        
     def Quit(self):
         print self.client.Socket.getsockname()
         if self.client.Socket.getsockname()!= ('0.0.0.0', 0):
-            self.client.Socket.send("USER " + self.iam + " DISCONNECT" )
-            self.client.Socket.send(Command.clientDisconnect)
-            while True:
-                self.client.Socket.send(self.iam)
-                self.datas = self.client.GetReceivedData()
-                if self.data.decode() == Command.clientDestroy:
-                    self.client.Socket.close()
-                    root.destroy()
+            self.client.Socket.send(self.iam)
+            #self.close()
+            self.datas = self.client.Socket.recv(1024)
+            print "Drop like"
+            print self.datas
+            if self.datas.decode() == Command.readyToStop:
+                self.client.Socket.send(Command.readyToStop)
+                self.client.Socket.close()
+                root.destroy()
         else:
             root.destroy()
         
     def StartReceive(self):
         self.client.Socket.send(Command.readyToResive)
-        while True:
+        while not self.stop_event.isSet():
             self.datas = self.client.GetReceivedData()
-            print self.datas
-            t = type(self.datas)
-            if t == str:
-                if self.datas == Command.clientDisconnect:
-                    self.richTextBox1.config(state=NORMAL)
-                    self.richTextBox1.insert(END,"You was disconnected by server. Please try reconnect"+'\n')
-                    self.richTextBox1.config(state=DISABLED)
-                else:
-                    self.richTextBox1.config(state=NORMAL)
-                    self.richTextBox1.tag_config('that',foreground='green',font=("Arial", 10,'bold'))
-                    self.richTextBox1.insert(END, self.datas+'\n','that')
-                    self.richTextBox1.config(state=DISABLED)
-            elif t == list:    
-                for data in self.datas:
-                    if data[0]=='@':
-                        self.listbox1.insert(END,data)
-            
-            l = self.listbox1.get(0, END)
-            s = set(l)
-            l = list(s)
-            self.listbox1.delete(0, END)
-            for a in l:
-                if a == "@"+self.iam:
-                    self.listbox1.insert(END,a+"(You)")
-                else:
-                    self.listbox1.insert(END,a)
-            
+            if self.datas == Command.clientDestroy:
+                self.close()
+            else:    
+                t = type(self.datas)
+                if t == str:
+                    if self.datas == Command.clientDisconnect:
+                        self.richTextBox1.config(state=NORMAL)
+                        self.richTextBox1.insert(END,"You was disconnected by server. Please try reconnect"+'\n')
+                        self.richTextBox1.config(state=DISABLED)
+                    else:
+                        self.richTextBox1.config(state=NORMAL)
+                        self.richTextBox1.tag_config('that',foreground='green',font=("Arial", 10,'bold'))
+                        self.richTextBox1.insert(END, self.datas+'\n','that')
+                        self.richTextBox1.config(state=DISABLED)
+                elif t == list:    
+                    for data in self.datas:
+                        if data[0]=='@':
+                            self.listbox1.insert(END,data)
+                
+                l = self.listbox1.get(0, END)
+                s = set(l)
+                l = list(s)
+                self.listbox1.delete(0, END)
+                for a in l:
+                    if a == "@"+self.iam:
+                        self.listbox1.insert(END,a+"(You)")
+                    else:
+                        self.listbox1.insert(END,a)
+    def close(self):
+        self.stop_event.set()
                     
 
 root = Tk()

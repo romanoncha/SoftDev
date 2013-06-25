@@ -7,7 +7,8 @@ from threading import Thread
 from Command import *
 from re import compile, findall
 import time
-
+global x
+x=0
 class ClientInfo:
     def __init__(self):
         self.userName=""
@@ -66,4 +67,4 @@ class Client ():
         now = time.localtime(time.time())
         year, month, day, hour, minute, second, weekday, yearday, daylight = now
         message ="[" +"%02d:%02d:%02d" % (hour, minute, second)+"] " + message
-        return message
+        return message  

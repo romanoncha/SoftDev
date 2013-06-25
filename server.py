@@ -21,6 +21,8 @@ global MessageList
 MessageList = []
 global max_message
 max_message = 20
+global count
+count=0
 
 class Server(object):
 
@@ -28,9 +30,7 @@ class Server(object):
         '''Base constructor'''
         self.port = port
         self.sock = socket(AF_INET, SOCK_STREAM)
-        self.count = 0
-
-
+        count=0
     def Start(self):
         '''Start Server'''
         self.port = self.FindFreePort()
@@ -44,12 +44,12 @@ class Server(object):
 
         self.consoleThread = ServerConsoleThread(self.sock)
         self.consoleThread.start()
-
         while True:
+            global count
             self.conn, self.adrr = self.sock.accept()
             ConnClient.append(ClientThreading(self.conn,self.adrr))
-            ConnClient[self.count].start()
-            self.count += 1
+            ConnClient[count].start()
+            count += 1
 
 
     def Close(self):

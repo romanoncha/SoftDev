@@ -21,3 +21,6 @@ clientDisconnect = "/clientDisconnect/"
 
 global clientDestroy
 clientDestroy = "/destroy/"
+
+global readyToStop
+readyToStop = "/readyToStop/"

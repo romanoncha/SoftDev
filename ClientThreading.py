@@ -11,6 +11,7 @@ class ClientThreading(threading.Thread):
         self.clientSock = clientSock
         self.addr = addr
         threading.Thread.__init__(self)
+        self.stop_event = threading.Event()
 
     def run (self):
 
@@ -20,6 +21,8 @@ class ClientThreading(threading.Thread):
             self.SendUserList()
         self.SendMessageList()
         self.Chat()
+        self.SendUserList()
+        self.Close()
 
 
     def Close(self):
@@ -55,17 +58,24 @@ class ClientThreading(threading.Thread):
 
     def Chat(self):
 
-        while True:
+        while not self.stop_event.isSet():
             self.messageIn = self.clientSock.recv(1024)
             self.messageIn.decode()
-            if self.messageIn == Command.clientDisconnect:
+            if self.messageIn in server.ClientsLogins:
+                self.log=self.messageIn
+                self.index = server.ClientsLogins.index(self.messageIn)
+                server.ConnClient[self.index].GetSocket().send(Command.clientDestroy)
+                server.ConnClient[self.index].GetSocket().send(Command.readyToStop)
                 self.messageIn = self.clientSock.recv(1024)
-                self.messageIn.decode() 
-                if self.messageIn in server.ClientsLogins:
-                    self.index = server.ClientsLogins.index(self.messageIn)
-                    server.ConnClient[self.index].GetSocket().send(Command.clientDestroy)
+                if self.messageIn == Command.readyToStop:
                     server.ConnClient[self.index].Close()
-                    del server.ClientsLogins[self.index]
+                    del server.ConnClient[self.index]
+                    server.ClientsLogins.remove(self.log)
+                    self.messageIn = self.FormMessage("USER "+self.log+" DISCONNECT")
+                    self.AddToMessageList(self.messageIn)
+                    self.SendMessageForAll(self.messageIn)
+                    server.count-=1
+                    self.stop_event.set()
             else:
                 self.messageIn = self.FormMessage(self.messageIn)
                 print "In Chat"
@@ -93,7 +103,8 @@ class ClientThreading(threading.Thread):
 
         length = len(server.MessageList)
         if length >= server.max_message:
-            server.MessageList.delete(0)
+            buf=server.MessageList[0]
+            server.MessageList.remove(buf)
         server.MessageList.append(message)
         print "MessageList"
 
