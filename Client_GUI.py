@@ -28,13 +28,13 @@ class FormAuthorization:
         self.richTextBox1.config(state=DISABLED)
         self.richTextBox1.place(x=15, y=15, width=450)
 
-		#smile initialization
-		self.smiles = ["smiles/smile.gif", "smiles/sad.gif"]
-		self.photo = []
-		self.photo.append(PhotoImage(file=self.smiles[0]))
-		self.photo.append(PhotoImage(file=self.smiles[1]))
-		self.richTextBox1.image = self.photo	
-		#smile initialization
+	#smile initialization
+        self.smiles = ["smiles/smile.gif", "smiles/sad.gif"]
+        self.photo = []
+        self.photo.append(PhotoImage(file=self.smiles[0]))
+        self.photo.append(PhotoImage(file=self.smiles[1]))
+        self.richTextBox1.image = self.photo	
+	#smile initialization
 
         self.listbox1 = Listbox(root, height=20, width=20, selectmode=EXTENDED)
         self.listbox1.place(x=475, y=15)
@@ -52,7 +52,7 @@ class FormAuthorization:
             self.client.Send(self.iam + ": " + self.message.get())
             self.richTextBox1.config(state=NORMAL)
             self.richTextBox1.tag_config('this',foreground='red',font=("Arial", 10,'bold'))
-			self.findSmiles(mess +'\n','this')#insert message in richTextBox1            
+            self.findSmiles(mess +'\n','this')#insert message in richTextBox1            
             self.richTextBox1.config(state=DISABLED)
             textOfMessage.delete('0', END)
 
@@ -63,15 +63,15 @@ class FormAuthorization:
         ###########################
 
     def findSmiles(self, data, flag):	
-		for i in range(len(data)):
-			if data[i] == ':' and data[i+1] == ')':			
-				self.richTextBox1.image_create(END, image=self.photo[0]) 								
-			elif data[i] == ':' and data[i+1] == '(':			
-				self.richTextBox1.image_create(END, image=self.photo[1])  		
-			elif data[i] == ')' or data[i] == '(':
-				continue
-			else:
-				self.richTextBox1.insert(END, data[i], flag)        
+        for i in range(len(data)):
+            if data[i] == ':' and data[i+1] == ')':			
+                self.richTextBox1.image_create(END, image=self.photo[0]) 								
+            elif data[i] == ':' and data[i+1] == '(':			
+                self.richTextBox1.image_create(END, image=self.photo[1])  		
+            elif data[i] == ')' or data[i] == '(':
+                continue
+            else:
+                self.richTextBox1.insert(END, data[i], flag)        
 
             
     def connect(self):
@@ -183,7 +183,7 @@ class FormAuthorization:
                     else:
                         self.richTextBox1.config(state=NORMAL)
                         self.richTextBox1.tag_config('that',foreground='green',font=("Arial", 10,'bold'))
-						self.findSmiles(self.datas +'\n','that')#insert message in richTextBox1                        
+                        self.findSmiles(self.datas +'\n','that')#insert message in richTextBox1                        
                         self.richTextBox1.config(state=DISABLED)
                 elif t == list:    
                     for data in self.datas:
